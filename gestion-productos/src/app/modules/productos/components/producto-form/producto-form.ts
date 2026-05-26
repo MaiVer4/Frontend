@@ -1,6 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Producto } from '../../../../core/core/services/producto';
+import { Producto } from '../../../../core/models/producto.interface';
 
 @Component({
   selector: 'app-producto-form',
@@ -8,11 +8,12 @@ import { Producto } from '../../../../core/core/services/producto';
   templateUrl: './producto-form.html',
   styleUrl: './producto-form.css',
 })
-export class ProductoForm implements OnInit {
-  @Input() isVisble: boolean= false;
+export class ProductoForm implements OnInit, OnChanges {
+  @Input() isVisible: boolean = false;
 
   @Output() onClose = new EventEmitter<void>();
   @Output() onSave = new EventEmitter<Producto>();
+  @Input() producto?: Producto | null;
 
   productoForm!: FormGroup;
 
@@ -22,13 +23,26 @@ export class ProductoForm implements OnInit {
     this.initForm();
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['producto']) {
+      if (!this.productoForm) {
+        this.initForm();
+      }
+      if (this.producto) {
+        this.productoForm.patchValue(this.producto);
+      } else {
+        this.productoForm.reset({ estado: 'ACTIVO', precio: 0, cantidad: 0 });
+      }
+    }
+  }
+
   private initForm(): void {
     this.productoForm = this.fb.group({
       codigo: ['', [Validators.required, Validators.minLength(3)]],
       nombre: ['', [Validators.required]],
-      descripcion: ['', [Validators.maxLength(200)]],
-      precio: [0, [Validators.required, Validators.min(0.01)]],
-      cantidad: [0, [Validators.required, Validators.min(1)]],
+      descripcion: ['', [Validators.maxLength(255)]],
+      precio: [0, [Validators.required, Validators.min(0)]],
+      cantidad: [0, [Validators.required, Validators.min(0)]],
       estado: ['ACTIVO', Validators.required],
       imagenUrl: ['', [Validators.required, Validators.pattern('https?://.+')]]
     });
@@ -36,13 +50,60 @@ export class ProductoForm implements OnInit {
 
   guardar(): void {
     if (this.productoForm.valid) {
-      this.onSave.emit(this.productoForm.value);
+      const producto: Producto = this.productoForm.value as Producto;
+      this.onSave.emit(producto);
       this.cancelar();
     }
   }
 
   cancelar(): void {
-      this.productoForm.reset({ estado: 'ACTIVO', precio: 0, cantidad: 0});
-      this.onClose.emit();
+    this.productoForm.reset({ estado: 'ACTIVO', precio: 0, cantidad: 0 });
+    this.onClose.emit();
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.productoForm.get(fieldName);
+    if (!control || !control.errors || !control.touched) {
+      return '';
+    }
+
+    if (control.errors['required']) {
+      return `${this.getFieldLabel(fieldName)} es requerido`;
+    }
+    if (control.errors['minLength']) {
+      return `${this.getFieldLabel(fieldName)} debe tener al menos ${control.errors['minLength'].requiredLength} caracteres`;
+    }
+    if (control.errors['min']) {
+      return `${this.getFieldLabel(fieldName)} no puede ser menor a ${control.errors['min'].min}`;
+    }
+    if (control.errors['maxLength']) {
+      return `${this.getFieldLabel(fieldName)} no puede exceder ${control.errors['maxLength'].requiredLength} caracteres`;
+    }
+    if (control.errors['pattern']) {
+      if (fieldName === 'imagenUrl') {
+        return 'La URL debe comenzar con http:// o https://';
+      }
+      return `${this.getFieldLabel(fieldName)} tiene un formato inválido`;
+    }
+
+    return 'Campo inválido';
+  }
+
+  private getFieldLabel(fieldName: string): string {
+    const labels: { [key: string]: string } = {
+      codigo: 'Código',
+      nombre: 'Nombre',
+      descripcion: 'Descripción',
+      precio: 'Precio',
+      cantidad: 'Cantidad',
+      estado: 'Estado',
+      imagenUrl: 'URL de la Imagen'
+    };
+    return labels[fieldName] || fieldName;
+  }
+
+  isFieldInvalid(fieldName: string): boolean {
+    const control = this.productoForm.get(fieldName);
+    return control ? control.invalid && control.touched : false;
   }
 }

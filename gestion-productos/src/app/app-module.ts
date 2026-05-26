@@ -1,6 +1,6 @@
-import { NgModule, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClient, HttpClientModule } from '@angular/common/http'; 
+import { HttpClientModule } from '@angular/common/http'; 
 
 import { AppRoutingModule } from './app-routing.module';
 import { App } from './app';
@@ -15,9 +15,6 @@ import { CoreModule } from './core/core-module';
     AppRoutingModule,
     HttpClientModule,
     CoreModule
-  ],
-  providers: [
-    provideBrowserGlobalErrorListeners(),
   ],
   bootstrap: [App]
 })

@@ -1,59 +1,79 @@
-<div *ngIf="isVisible" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm transition-all">
-  
-  <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden border border-slate-100">
-    <div class="p-8">
-      <h2 class="text-2xl font-bold text-slate-800 mb-6">Nuevo Producto</h2>
-      
-      <form [formGroup]="productoForm" (ngSubmit)="guardar()" class="space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-600 mb-1">Código</label>
-            <input type="text" formControlName="codigo" placeholder="Ej: PROD-001"
-              class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-lime-400 focus:border-transparent outline-none">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-600 mb-1">Nombre</label>
-            <input type="text" formControlName="nombre"
-              class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-lime-400 outline-none">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-slate-600 mb-1">Descripción</label>
-          <textarea formControlName="descripcion" rows="2"
-            class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-lime-400 outline-none"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-slate-600 mb-1">URL de la Imagen</label>
-          <input type="text" formControlName="imagenUrl" placeholder="https://..."
-            class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-lime-400 outline-none">
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-slate-600 mb-1">Precio ($)</label>
-            <input type="number" formControlName="precio"
-              class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-lime-400 outline-none">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-slate-600 mb-1">Cantidad</label>
-            <input type="number" formControlName="cantidad"
-              class="w-full px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-lime-400 outline-none">
-          </div>
-        </div>
-
-        <div class="flex justify-end gap-3 mt-8">
-          <button type="button" (click)="cancelar()"
-            class="px-6 py-2.5 text-slate-500 font-medium hover:bg-slate-50 rounded-xl transition-colors">
-            Cancelar
-          </button>
-          <button type="submit" [disabled]="productoForm.invalid"
-            class="px-6 py-2.5 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 disabled:opacity-50 transition-all shadow-lg shadow-slate-200">
-            Crear Producto
-          </button>
-        </div>
-      </form>
+<div *ngIf="isVisible" class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-header">
+      <div>
+        <h2>{{ producto?.codigo ? 'Editar producto' : 'Nuevo producto' }}</h2>
+        <p>Completa los datos para guardar el producto.</p>
+      </div>
+      <button type="button" class="modal-close" (click)="cancelar()" aria-label="Cerrar">×</button>
     </div>
+
+    <form [formGroup]="productoForm" (ngSubmit)="guardar()" class="modal-form">
+      <div class="form-row">
+        <label>
+          Código
+          <input type="text" formControlName="codigo" placeholder="Ej: PROD-001" />
+          <span class="error-message" *ngIf="isFieldInvalid('codigo')">
+            {{ getErrorMessage('codigo') }}
+          </span>
+        </label>
+        <label>
+          Nombre
+          <input type="text" formControlName="nombre" placeholder="Nombre del producto" />
+          <span class="error-message" *ngIf="isFieldInvalid('nombre')">
+            {{ getErrorMessage('nombre') }}
+          </span>
+        </label>
+      </div>
+
+      <label class="full-width">
+        Descripción
+        <textarea formControlName="descripcion" rows="3" placeholder="Descripción breve"></textarea>
+        <span class="error-message" *ngIf="isFieldInvalid('descripcion')">
+          {{ getErrorMessage('descripcion') }}
+        </span>
+      </label>
+
+      <label class="full-width">
+        URL de la Imagen
+        <input type="text" formControlName="imagenUrl" placeholder="https://..." />
+        <span class="error-message" *ngIf="isFieldInvalid('imagenUrl')">
+          {{ getErrorMessage('imagenUrl') }}
+        </span>
+      </label>
+
+      <div class="form-row">
+        <label>
+          Precio ($)
+          <input type="number" formControlName="precio" min="0" step="0.01" />
+          <span class="error-message" *ngIf="isFieldInvalid('precio')">
+            {{ getErrorMessage('precio') }}
+          </span>
+        </label>
+        <label>
+          Cantidad
+          <input type="number" formControlName="cantidad" min="0" />
+          <span class="error-message" *ngIf="isFieldInvalid('cantidad')">
+            {{ getErrorMessage('cantidad') }}
+          </span>
+        </label>
+      </div>
+
+      <label class="full-width">
+        Estado
+        <select formControlName="estado">
+          <option value="ACTIVO">ACTIVO</option>
+          <option value="INACTIVO">INACTIVO</option>
+        </select>
+        <span class="error-message" *ngIf="isFieldInvalid('estado')">
+          {{ getErrorMessage('estado') }}
+        </span>
+      </label>
+
+      <div class="form-actions">
+        <button type="button" class="button button-secondary" (click)="cancelar()">Cancelar</button>
+        <button type="submit" class="button button-primary" [disabled]="productoForm.invalid">{{ producto?.codigo ? 'Actualizar' : 'Crear' }}</button>
+      </div>
+    </form>
   </div>
 </div>

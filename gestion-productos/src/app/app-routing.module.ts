@@ -10,10 +10,6 @@ const routes: Routes = [
     path: '',
     redirectTo: 'productos',
     pathMatch: 'full'
-  },
-  {
-    path: '**',
-    redirectTo: 'productos'
   }
 ];
 

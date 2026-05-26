@@ -1,1 +1,103 @@
-<p>catalogo-dashboard works!</p>
+<div class="dashboard-page">
+  <section class="dashboard-hero">
+    <div class="hero-title">
+      <div class="brand-icon">🧱</div>
+      <div>
+        <h1>Gestión de Productos</h1>
+        <p>Administra el catálogo de la tienda</p>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <button type="button" class="button button-secondary" (click)="cargarProductos()">Recargar</button>
+      <button type="button" class="button button-primary" (click)="abrirNuevo()">Nuevo producto</button>
+    </div>
+  </section>
+
+  <section *ngIf="errorMessage" class="alert-banner">
+    <span>{{ errorMessage }}</span>
+    <button type="button" class="close-alert" (click)="errorMessage = undefined">×</button>
+  </section>
+
+  <section class="stats-grid">
+    <article class="stat-card">
+      <span class="stat-label">Total productos</span>
+      <strong>{{ totalProductos }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Activos</span>
+      <strong>{{ activos }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Inactivos</span>
+      <strong>{{ inactivos }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Unidades en stock</span>
+      <strong>{{ unidadesStock }}</strong>
+    </article>
+    <article class="stat-card">
+      <span class="stat-label">Valor inventario</span>
+      <strong>{{ valorInventario | currency:'USD':'symbol':'1.0-0' }}</strong>
+    </article>
+  </section>
+
+  <section class="table-panel">
+    <div class="table-header">
+      <div>
+        <h2>Productos ({{ totalProductos }})</h2>
+        <p class="table-description">Lista de productos registrados y disponibles en el sistema.</p>
+      </div>
+      <div class="table-actions">
+        <span *ngIf="loading">Cargando...</span>
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Código</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Precio</th>
+            <th>Cantidad</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody *ngIf="productos.length > 0">
+          <tr *ngFor="let p of productos">
+            <td class="image-cell">
+              <img [src]="p.imagenUrl" [alt]="p.nombre" class="product-image" />
+            </td>
+            <td>{{ p.codigo }}</td>
+            <td>{{ p.nombre }}</td>
+            <td>{{ p.descripcion }}</td>
+            <td>{{ p.precio | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ p.cantidad }}</td>
+            <td>
+              <span class="pill" [class.pill--active]="p.estado === 'ACTIVO'" [class.pill--inactive]="p.estado === 'INACTIVO'">{{ p.estado }}</span>
+            </td>
+            <td class="actions-cell">
+              <button class="button button-small button-ghost" (click)="editar(p)">Editar</button>
+              <button class="button button-small button-danger" (click)="eliminar(p.codigo)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="productos.length === 0" class="empty-table">
+        No hay productos registrados
+      </div>
+    </div>
+  </section>
+
+  <app-producto-form
+    [isVisible]="mostrarModal"
+    [producto]="productoSeleccionado"
+    (onClose)="cerrarModal()"
+    (onSave)="guardarDesdeForm($event)">
+  </app-producto-form>
+</div>
