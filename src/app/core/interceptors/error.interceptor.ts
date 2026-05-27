@@ -101,9 +101,13 @@ export class ErrorInterceptor implements HttpInterceptor {
         };
 
       default:
+        const fallbackMessage = apiError?.message ??
+          (error.statusText && error.statusText !== 'OK' ? error.statusText : undefined) ??
+          'Error desconocido';
+
         return {
           status: error.status,
-          message: apiError?.message ?? error.statusText ?? 'Error desconocido',
+          message: fallbackMessage,
           tipo: 'UNKNOWN_ERROR',
           details: apiError
         };

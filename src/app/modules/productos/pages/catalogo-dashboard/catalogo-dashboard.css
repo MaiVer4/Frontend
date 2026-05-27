@@ -89,28 +89,6 @@
   color: #fff;
 }
 
-.alert-banner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 18px;
-  background: #f8d7da;
-  color: #842029;
-  border: 1px solid #f5c2c7;
-  border-radius: 16px;
-  margin-bottom: 24px;
-}
-
-.close-alert {
-  background: transparent;
-  border: none;
-  color: #842029;
-  cursor: pointer;
-  font-size: 20px;
-  line-height: 1;
-}
-
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -235,6 +213,8 @@
 
 .table-wrapper {
   padding: 24px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .product-table {
@@ -311,6 +291,27 @@
   }
 }
 
+@media (max-width: 1024px) and (min-width: 721px) {
+  .product-table th,
+  .product-table td {
+    padding: 14px 10px;
+    font-size: 0.9rem;
+  }
+
+  .product-image {
+    width: 50px;
+    height: 50px;
+  }
+
+  .actions-cell {
+    flex-direction: column;
+  }
+
+  .button-small {
+    width: 100%;
+  }
+}
+
 @media (max-width: 720px) {
   .dashboard-page {
     padding: 20px 16px 40px;
@@ -327,5 +328,76 @@
 
   .button {
     width: 100%;
+  }
+
+  .table-panel {
+    border-radius: 16px;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .table-header h2 {
+    font-size: 1rem;
+  }
+
+  .table-wrapper {
+    padding: 16px;
+  }
+
+  .product-table th,
+  .product-table td {
+    padding: 12px 8px;
+    font-size: 0.85rem;
+  }
+
+  .product-table thead {
+    display: none;
+  }
+
+  .product-table tbody tr {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .product-table tbody td {
+    display: contents;
+    border: none;
+    padding: 0;
+  }
+
+  .product-table tbody td:first-child {
+    grid-column: 1 / 2;
+    grid-row: 1 / 5;
+  }
+
+  .image-cell {
+    padding: 0 !important;
+  }
+
+  .product-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .actions-cell {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    margin-top: 8px;
+  }
+
+  .button-small {
+    flex: 1;
+    padding: 6px;
+    font-size: 0.8rem;
   }
 }

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ToastNotificationComponent } from './components/toast-notification/toast-notification.component';
 
 /**
  * SharedModule
@@ -10,10 +11,11 @@ import { CommonModule } from '@angular/common';
  * Este módulo debe ser importado en los módulos de features
  * que necesitan componentes compartidos.
  * 
- * Exports: (Vacío por ahora - agregar componentes compartidos aquí)
+ * Exports: ToastNotificationComponent
  */
 @NgModule({
+  declarations: [ToastNotificationComponent],
   imports: [CommonModule],
-  exports: [CommonModule]
+  exports: [CommonModule, ToastNotificationComponent]
 })
 export class SharedModule {}

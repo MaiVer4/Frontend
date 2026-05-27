@@ -14,11 +14,6 @@
     </div>
   </section>
 
-  <section *ngIf="errorMessage" class="alert-banner">
-    <span>{{ errorMessage }}</span>
-    <button type="button" class="close-alert" (click)="errorMessage = undefined">×</button>
-  </section>
-
   <section class="stats-grid">
     <article class="stat-card">
       <span class="stat-label">Total productos</span>
@@ -101,3 +96,5 @@
     (onSave)="guardarDesdeForm($event)">
   </app-producto-form>
 </div>
+
+<app-toast-notification></app-toast-notification>

@@ -1,21 +1,24 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Producto } from '../../../../core/models/producto.interface';
 import { ProductoService } from '../../../../core/service/producto.service';
+import { ToastNotificationService } from '../../../../shared/services/toast-notification.service';
 
 @Component({
   selector: 'app-catalogo-dashboard',
   standalone: false,
   templateUrl: './catalogo-dashboard.html',
-  styleUrl: './catalogo-dashboard.css',
+  styleUrls: ['./catalogo-dashboard.css'],
 })
 export class CatalogoDashboard implements OnInit {
   productos: Producto[] = [];
   mostrarModal = false;
   productoSeleccionado?: Producto | null;
-  errorMessage?: string;
   loading = false;
 
-  constructor(private productoService: ProductoService, private cdr: ChangeDetectorRef) {}
+  constructor(
+    private productoService: ProductoService,
+    private toastService: ToastNotificationService
+  ) {}
 
   ngOnInit(): void {
     this.cargarProductos();
@@ -43,19 +46,17 @@ export class CatalogoDashboard implements OnInit {
 
   cargarProductos(): void {
     this.loading = true;
-    this.errorMessage = undefined;
 
     this.productoService.obtenerProductos().subscribe({
       next: data => {
         this.productos = data;
         this.loading = false;
-        this.cdr.markForCheck();
       },
       error: err => {
         this.loading = false;
-        this.errorMessage = this.extractErrorMessage(err) || 'No se pudo cargar la lista de productos. Verifica el backend en http://localhost:8080';
+        const errorMessage = this.extractErrorMessage(err) || 'No se pudo cargar la lista de productos. Verifica el backend en http://localhost:8080';
+        this.toastService.error(errorMessage, 5000);
         console.error('Error cargando productos', err);
-        this.cdr.markForCheck();
       }
     });
   }
@@ -81,16 +82,16 @@ export class CatalogoDashboard implements OnInit {
   registrarNuevo(producto: Producto): void {
     this.productoService.crearProducto(producto).subscribe({
       next: () => {
+        this.toastService.success(`Producto "${producto.nombre}" creado exitosamente`);
         this.cargarProductos();
         setTimeout(() => {
           this.mostrarModal = false;
-          this.cdr.markForCheck();
-        });
+        }, 300);
       },
       error: err => {
-        this.errorMessage = this.extractErrorMessage(err) || 'No se pudo crear el producto. Revisa la conexión con el backend.';
+        const errorMessage = this.extractErrorMessage(err) || 'No se pudo crear el producto. Revisa la conexión con el backend.';
+        this.toastService.error(errorMessage);
         console.error('Error creando producto', err);
-        this.cdr.markForCheck();
       }
     });
   }
@@ -106,28 +107,33 @@ export class CatalogoDashboard implements OnInit {
 
     this.productoService.actualizarProducto(codigo, producto).subscribe({
       next: () => {
+        this.toastService.success(`Producto "${producto.nombre}" actualizado exitosamente`);
         this.cargarProductos();
         setTimeout(() => {
           this.mostrarModal = false;
           this.productoSeleccionado = null;
-          this.cdr.markForCheck();
-        });
+        }, 300);
       },
       error: err => {
-        this.errorMessage = this.extractErrorMessage(err) || 'No se pudo actualizar el producto. Revisa la conexión con el backend.';
+        const errorMessage = this.extractErrorMessage(err) || 'No se pudo actualizar el producto. Revisa la conexión con el backend.';
+        this.toastService.error(errorMessage);
         console.error('Error actualizando producto', err);
-        this.cdr.markForCheck();
       }
     });
   }
 
   eliminar(codigo: string): void {
+    const productName = this.productos.find(p => p.codigo === codigo)?.nombre || 'Producto';
+    
     this.productoService.eliminarProducto(codigo).subscribe({
-      next: () => this.cargarProductos(),
+      next: () => {
+        this.toastService.success(`Producto: ${productName} eliminado correctamente.`);
+        this.cargarProductos();
+      },
       error: err => {
-        this.errorMessage = this.extractErrorMessage(err) || 'No se pudo eliminar el producto. Revisa la conexión con el backend.';
+        const errorMessage = this.extractErrorMessage(err) || 'No se pudo eliminar el producto. Revisa la conexión con el backend.';
+        this.toastService.error(errorMessage);
         console.error('Error eliminando producto', err);
-        this.cdr.markForCheck();
       }
     });
   }
@@ -135,36 +141,5 @@ export class CatalogoDashboard implements OnInit {
   private extractErrorMessage(error: any): string | undefined {
     return error?.message || error?.error?.message;
   }
-
-  private createDemoProductos(): Producto[] {
-    return [
-      {
-        codigo: 'PROD-001',
-        nombre: 'Café Intenso',
-        descripcion: 'Café molido de tueste oscuro, 500 g.',
-        precio: 12.5,
-        cantidad: 24,
-        estado: 'ACTIVO',
-        imagenUrl: 'https://via.placeholder.com/120'
-      },
-      {
-        codigo: 'PROD-002',
-        nombre: 'Té Verde',
-        descripcion: 'Bolsitas de té verde natural con menta.',
-        precio: 8.9,
-        cantidad: 14,
-        estado: 'ACTIVO',
-        imagenUrl: 'https://via.placeholder.com/120'
-      },
-      {
-        codigo: 'PROD-003',
-        nombre: 'Jarabe de Maple',
-        descripcion: 'Sirope de maple orgánico, 250 ml.',
-        precio: 15.75,
-        cantidad: 0,
-        estado: 'INACTIVO',
-        imagenUrl: 'https://via.placeholder.com/120'
-      }
-    ];
-  }
-}
+  
+} 

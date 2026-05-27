@@ -66,6 +66,8 @@ export class ProductoService {
      * @returns Observable con respuesta vacía
      */
     eliminarProducto(codigo: string): Observable<void> {
-        return this.http.delete<void>(`${this.API_URL}/${codigo}`);
+        return this.http.delete(`${this.API_URL}/${codigo}`, { responseType: 'text' as 'json' }).pipe(
+            map(() => undefined)
+        );
     }
 }

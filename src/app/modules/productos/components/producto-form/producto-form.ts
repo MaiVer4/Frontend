@@ -6,7 +6,7 @@ import { Producto } from '../../../../core/models/producto.interface';
   selector: 'app-producto-form',
   standalone: false,
   templateUrl: './producto-form.html',
-  styleUrl: './producto-form.css',
+  styleUrls: ['./producto-form.css'],
 })
 export class ProductoForm implements OnInit, OnChanges {
   @Input() isVisible: boolean = false;
