@@ -84,9 +84,7 @@ export class CatalogoDashboard implements OnInit {
       next: () => {
         this.toastService.success(`Producto "${producto.nombre}" creado exitosamente`);
         this.cargarProductos();
-        setTimeout(() => {
-          this.mostrarModal = false;
-        }, 300);
+        this.mostrarModal = false;
       },
       error: err => {
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo crear el producto. Revisa la conexión con el backend.';
@@ -109,10 +107,8 @@ export class CatalogoDashboard implements OnInit {
       next: () => {
         this.toastService.success(`Producto "${producto.nombre}" actualizado exitosamente`);
         this.cargarProductos();
-        setTimeout(() => {
-          this.mostrarModal = false;
-          this.productoSeleccionado = null;
-        }, 300);
+        this.mostrarModal = false;
+        this.productoSeleccionado = null;
       },
       error: err => {
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo actualizar el producto. Revisa la conexión con el backend.';
@@ -124,10 +120,13 @@ export class CatalogoDashboard implements OnInit {
 
   eliminar(codigo: string): void {
     const productName = this.productos.find(p => p.codigo === codigo)?.nombre || 'Producto';
+    const confirmDelete = window.confirm(`¿Está seguro que desea eliminar "${productName}"? Esta acción no se puede deshacer.`);
+    
+    if (!confirmDelete) return;
     
     this.productoService.eliminarProducto(codigo).subscribe({
       next: () => {
-        this.toastService.success(`Producto: ${productName} eliminado correctamente.`);
+        this.toastService.success(`Producto "${productName}" eliminado correctamente`);
         this.cargarProductos();
       },
       error: err => {
@@ -141,5 +140,5 @@ export class CatalogoDashboard implements OnInit {
   private extractErrorMessage(error: any): string | undefined {
     return error?.message || error?.error?.message;
   }
-  
+
 } 
