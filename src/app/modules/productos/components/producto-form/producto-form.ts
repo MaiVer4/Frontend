@@ -17,6 +17,8 @@ export class ProductoForm implements OnInit, OnChanges {
 
   productoForm!: FormGroup;
 
+  private static readonly DEFAULT_RESET = { estado: 'ACTIVO', precio: 0, cantidad: 0 };
+
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
@@ -31,7 +33,7 @@ export class ProductoForm implements OnInit, OnChanges {
       if (this.producto) {
         this.productoForm.patchValue(this.producto);
       } else {
-        this.productoForm.reset({ estado: 'ACTIVO', precio: 0, cantidad: 0 });
+        this.productoForm.reset(ProductoForm.DEFAULT_RESET);
       }
     }
   }
@@ -57,7 +59,7 @@ export class ProductoForm implements OnInit, OnChanges {
   }
 
   cancelar(): void {
-    this.productoForm.reset({ estado: 'ACTIVO', precio: 0, cantidad: 0 });
+    this.productoForm.reset(ProductoForm.DEFAULT_RESET);
     this.onClose.emit();
   }
 
@@ -70,14 +72,14 @@ export class ProductoForm implements OnInit, OnChanges {
     if (control.errors['required']) {
       return `${this.getFieldLabel(fieldName)} es requerido`;
     }
-    if (control.errors['minLength']) {
-      return `${this.getFieldLabel(fieldName)} debe tener al menos ${control.errors['minLength'].requiredLength} caracteres`;
+    if (control.errors['minlength']) {
+      return `${this.getFieldLabel(fieldName)} debe tener al menos ${control.errors['minlength'].requiredLength} caracteres`;
     }
     if (control.errors['min']) {
       return `${this.getFieldLabel(fieldName)} no puede ser menor a ${control.errors['min'].min}`;
     }
-    if (control.errors['maxLength']) {
-      return `${this.getFieldLabel(fieldName)} no puede exceder ${control.errors['maxLength'].requiredLength} caracteres`;
+    if (control.errors['maxlength']) {
+      return `${this.getFieldLabel(fieldName)} no puede exceder ${control.errors['maxlength'].requiredLength} caracteres`;
     }
     if (control.errors['pattern']) {
       if (fieldName === 'imagenUrl') {

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Producto } from '../../../../core/models/producto.interface';
 import { ProductoService } from '../../../../core/service/producto.service';
 import { ToastNotificationService } from '../../../../shared/services/toast-notification.service';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 
 @Component({
   selector: 'app-catalogo-dashboard',
@@ -17,7 +18,8 @@ export class CatalogoDashboard implements OnInit {
 
   constructor(
     private productoService: ProductoService,
-    private toastService: ToastNotificationService
+    private toastService: ToastNotificationService,
+    private confirmService: ConfirmService
   ) {}
 
   ngOnInit(): void {
@@ -119,17 +121,30 @@ export class CatalogoDashboard implements OnInit {
   }
 
   eliminar(codigo: string): void {
-    const productName = this.productos.find(p => p.codigo === codigo)?.nombre || 'Producto';
-    const confirmDelete = window.confirm(`¿Está seguro que desea eliminar "${productName}"? Esta acción no se puede deshacer.`);
-    
+    const index = this.productos.findIndex(p => p.codigo === codigo);
+    const productName = index >= 0 ? this.productos[index].nombre : 'Producto';
+    const confirmDelete = this.confirmService.confirm(`¿Está seguro que desea eliminar "${productName}"? Esta acción no se puede deshacer.`);
+
     if (!confirmDelete) return;
-    
+
+    // Guardamos copia para poder revertir en caso de fallo
+    const previous = [...this.productos];
+
+    // Actualización optimista de la UI: removemos localmente inmediatamente
+    this.productos = this.productos.filter(p => p.codigo !== codigo);
+
+    // Mostrar notificación inmediata de que se inició la eliminación
+    this.toastService.info(`Eliminando "${productName}"...`, 2000);
+
     this.productoService.eliminarProducto(codigo).subscribe({
       next: () => {
         this.toastService.success(`Producto "${productName}" eliminado correctamente`);
+        // Refrescamos desde el servidor para mantener sincronía
         this.cargarProductos();
       },
       error: err => {
+        // Revertir cambios locales si falla la eliminación
+        this.productos = previous;
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo eliminar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         console.error('Error eliminando producto', err);
