@@ -133,8 +133,7 @@ export class CatalogoDashboard implements OnInit {
     // Actualización optimista de la UI: removemos localmente inmediatamente
     this.productos = this.productos.filter(p => p.codigo !== codigo);
 
-    // Mostrar notificación inmediata de que se inició la eliminación
-    this.toastService.info(`Eliminando "${productName}"...`, 2000);
+    // No mostrar notificación informativa; se mostrará sólo la confirmación de éxito o error
 
     this.productoService.eliminarProducto(codigo).subscribe({
       next: () => {
