@@ -82,11 +82,16 @@ export class CatalogoDashboard implements OnInit {
   }
 
   registrarNuevo(producto: Producto): void {
+    // Cerramos el modal para que la notificación sea visible inmediatamente
+    this.mostrarModal = false;
+
+    // Notificación de progreso
+    this.toastService.info(`Creando "${producto.nombre}"...`);
+
     this.productoService.crearProducto(producto).subscribe({
       next: () => {
         this.toastService.success(`Producto "${producto.nombre}" creado exitosamente`);
         this.cargarProductos();
-        this.mostrarModal = false;
       },
       error: err => {
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo crear el producto. Revisa la conexión con el backend.';
@@ -105,12 +110,15 @@ export class CatalogoDashboard implements OnInit {
     const codigo = this.productoSeleccionado?.codigo;
     if (!codigo) return;
 
+    // Cerramos el modal antes de la llamada para que la notificación sea visible
+    this.mostrarModal = false;
+    this.toastService.info(`Actualizando "${producto.nombre}"...`);
+
     this.productoService.actualizarProducto(codigo, producto).subscribe({
       next: () => {
         this.toastService.success(`Producto "${producto.nombre}" actualizado exitosamente`);
-        this.cargarProductos();
-        this.mostrarModal = false;
         this.productoSeleccionado = null;
+        this.cargarProductos();
       },
       error: err => {
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo actualizar el producto. Revisa la conexión con el backend.';
