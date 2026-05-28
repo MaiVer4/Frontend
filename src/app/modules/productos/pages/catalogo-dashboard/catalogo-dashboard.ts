@@ -82,15 +82,12 @@ export class CatalogoDashboard implements OnInit {
   }
 
   registrarNuevo(producto: Producto): void {
-    // Cerramos el modal para que la notificación sea visible inmediatamente
+    // Cerramos el modal y mostramos resultado inmediato para UX
     this.mostrarModal = false;
-
-    // Notificación de progreso
-    this.toastService.info(`Creando "${producto.nombre}"...`);
+    this.toastService.success(`Producto "${producto.nombre}" creado exitosamente`);
 
     this.productoService.crearProducto(producto).subscribe({
       next: () => {
-        this.toastService.success(`Producto "${producto.nombre}" creado exitosamente`);
         this.cargarProductos();
       },
       error: err => {
@@ -110,13 +107,12 @@ export class CatalogoDashboard implements OnInit {
     const codigo = this.productoSeleccionado?.codigo;
     if (!codigo) return;
 
-    // Cerramos el modal antes de la llamada para que la notificación sea visible
+    // Cerramos el modal y mostramos resultado inmediato para UX
     this.mostrarModal = false;
-    this.toastService.info(`Actualizando "${producto.nombre}"...`);
+    this.toastService.success(`Producto "${producto.nombre}" actualizado exitosamente`);
 
     this.productoService.actualizarProducto(codigo, producto).subscribe({
       next: () => {
-        this.toastService.success(`Producto "${producto.nombre}" actualizado exitosamente`);
         this.productoSeleccionado = null;
         this.cargarProductos();
       },
