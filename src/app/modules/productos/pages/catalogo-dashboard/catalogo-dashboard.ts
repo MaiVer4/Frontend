@@ -90,7 +90,7 @@ export class CatalogoDashboard implements OnInit {
 
     // Cerramos modal y mostramos notificación de éxito inmediata
     this.mostrarModal = false;
-    this.toastService.success(`Producto "${producto.nombre}" creado exitosamente`);
+    const toastId = this.toastService.success(`Producto "${producto.nombre}" creado exitosamente`);
 
     this.productoService.crearProducto(producto).subscribe({
       next: () => {
@@ -100,6 +100,7 @@ export class CatalogoDashboard implements OnInit {
       error: err => {
         // Revertir si falla
         this.productos = previous;
+        this.toastService.remove(toastId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo crear el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         console.error('Error creando producto', err);
@@ -127,7 +128,7 @@ export class CatalogoDashboard implements OnInit {
 
     // Cerramos modal y notificamos éxito inmediatamente
     this.mostrarModal = false;
-    this.toastService.success(`Producto "${producto.nombre}" actualizado exitosamente`);
+    const toastId = this.toastService.success(`Producto "${producto.nombre}" actualizado exitosamente`);
 
     this.productoService.actualizarProducto(codigo, producto).subscribe({
       next: () => {
@@ -137,6 +138,7 @@ export class CatalogoDashboard implements OnInit {
       error: err => {
         // Revertir cambios locales
         this.productos = previous;
+        this.toastService.remove(toastId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo actualizar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         console.error('Error actualizando producto', err);
@@ -158,7 +160,7 @@ export class CatalogoDashboard implements OnInit {
     this.productos = this.productos.filter(p => p.codigo !== codigo);
 
     // Notificación instantánea al usuario
-    this.toastService.success(`Producto "${productName}" eliminado correctamente`);
+    const toastId = this.toastService.success(`Producto "${productName}" eliminado correctamente`);
 
     this.productoService.eliminarProducto(codigo).subscribe({
       next: () => {
@@ -168,6 +170,7 @@ export class CatalogoDashboard implements OnInit {
       error: err => {
         // Revertir cambios locales si falla la eliminación
         this.productos = previous;
+        this.toastService.remove(toastId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo eliminar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         console.error('Error eliminando producto', err);

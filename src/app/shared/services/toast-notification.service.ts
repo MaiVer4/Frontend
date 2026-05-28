@@ -19,23 +19,23 @@ export class ToastNotificationService {
     return this.toasts$.asObservable();
   }
 
-  success(message: string, duration = 3000): void {
-    this.show(message, 'success', duration);
+  success(message: string, duration = 3000): string {
+    return this.show(message, 'success', duration);
   }
 
-  error(message: string, duration = 5000): void {
-    this.show(message, 'error', duration);
+  error(message: string, duration = 5000): string {
+    return this.show(message, 'error', duration);
   }
 
-  info(message: string, duration = 3000): void {
-    this.show(message, 'info', duration);
+  info(message: string, duration = 3000): string {
+    return this.show(message, 'info', duration);
   }
 
-  warning(message: string, duration = 4000): void {
-    this.show(message, 'warning', duration);
+  warning(message: string, duration = 4000): string {
+    return this.show(message, 'warning', duration);
   }
 
-  private show(message: string, type: Toast['type'], duration: number = 3000): void {
+  private show(message: string, type: Toast['type'], duration: number = 3000): string {
     const id = `toast-${++this.toastCounter}`;
     const toast: Toast = { id, message, type, duration };
 
@@ -47,6 +47,8 @@ export class ToastNotificationService {
         this.remove(id);
       }, duration);
     }
+
+    return id;
   }
 
   remove(id: string): void {
