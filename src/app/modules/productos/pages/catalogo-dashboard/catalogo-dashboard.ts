@@ -82,15 +82,24 @@ export class CatalogoDashboard implements OnInit {
   }
 
   registrarNuevo(producto: Producto): void {
-    // Cerramos el modal y mostramos resultado inmediato para UX
+    // Guardamos copia para revertir si falla
+    const previous = [...this.productos];
+
+    // Actualización optimista: añadimos el producto localmente para que sea visible inmediatamente
+    this.productos = [producto, ...this.productos];
+
+    // Cerramos modal y mostramos notificación de éxito inmediata
     this.mostrarModal = false;
     this.toastService.success(`Producto "${producto.nombre}" creado exitosamente`);
 
     this.productoService.crearProducto(producto).subscribe({
       next: () => {
+        // Refrescar desde servidor para obtener datos canónicos
         this.cargarProductos();
       },
       error: err => {
+        // Revertir si falla
+        this.productos = previous;
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo crear el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         console.error('Error creando producto', err);
@@ -106,8 +115,17 @@ export class CatalogoDashboard implements OnInit {
   actualizar(producto: Producto): void {
     const codigo = this.productoSeleccionado?.codigo;
     if (!codigo) return;
+    // Guardamos copia para poder revertir si es necesario
+    const previous = [...this.productos];
 
-    // Cerramos el modal y mostramos resultado inmediato para UX
+    // Actualización optimista: actualizamos la lista localmente
+    const idx = this.productos.findIndex(p => p.codigo === codigo);
+    if (idx >= 0) {
+      const updatedLocal = { ...this.productos[idx], ...producto };
+      this.productos = this.productos.map(p => p.codigo === codigo ? updatedLocal : p);
+    }
+
+    // Cerramos modal y notificamos éxito inmediatamente
     this.mostrarModal = false;
     this.toastService.success(`Producto "${producto.nombre}" actualizado exitosamente`);
 
@@ -117,6 +135,8 @@ export class CatalogoDashboard implements OnInit {
         this.cargarProductos();
       },
       error: err => {
+        // Revertir cambios locales
+        this.productos = previous;
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo actualizar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         console.error('Error actualizando producto', err);
