@@ -3,6 +3,7 @@ import { Producto } from '../../../../core/models/producto.interface';
 import { ProductoService } from '../../../../core/service/producto.service';
 import { ToastNotificationService } from '../../../../shared/services/toast-notification.service';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
+import { LoggerService } from '../../../../shared/services/logger.service';
 
 @Component({
   selector: 'app-catalogo-dashboard',
@@ -19,7 +20,8 @@ export class CatalogoDashboard implements OnInit {
   constructor(
     private productoService: ProductoService,
     private toastService: ToastNotificationService,
-    private confirmService: ConfirmService
+    private confirmService: ConfirmService,
+    private logger: LoggerService
   ) {}
 
   ngOnInit(): void {
@@ -58,7 +60,7 @@ export class CatalogoDashboard implements OnInit {
         this.loading = false;
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo cargar la lista de productos. Verifica el backend en http://localhost:8080';
         this.toastService.error(errorMessage, 5000);
-        console.error('Error cargando productos', err);
+        this.logger.error('Error cargando productos', err);
       }
     });
   }
@@ -103,7 +105,7 @@ export class CatalogoDashboard implements OnInit {
         this.toastService.remove(toastId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo crear el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
-        console.error('Error creando producto', err);
+        this.logger.error('Error creando producto', err);
       }
     });
   }
@@ -141,7 +143,7 @@ export class CatalogoDashboard implements OnInit {
         this.toastService.remove(toastId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo actualizar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
-        console.error('Error actualizando producto', err);
+        this.logger.error('Error actualizando producto', err);
       }
     });
   }
@@ -173,7 +175,7 @@ export class CatalogoDashboard implements OnInit {
         this.toastService.remove(toastId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo eliminar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
-        console.error('Error eliminando producto', err);
+        this.logger.error('Error eliminando producto', err);
       }
     });
   }

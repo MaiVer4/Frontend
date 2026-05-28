@@ -9,6 +9,7 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { ApiErrorDto } from '../models/api-error.dto';
+import { LoggerService } from '../../shared/services/logger.service';
 
 /**
  * ErrorInterceptor
@@ -24,7 +25,7 @@ import { ApiErrorDto } from '../models/api-error.dto';
  */
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-  constructor() {}
+  constructor(private logger: LoggerService) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
@@ -38,7 +39,7 @@ export class ErrorInterceptor implements HttpInterceptor {
    * @returns Observable que emite un error normalizado
    */
   private handleError(error: HttpErrorResponse) {
-    console.error('HTTP Error interceptado:', {
+    this.logger.error('HTTP Error interceptado:', {
       status: error.status,
       statusText: error.statusText,
       url: error.url,
