@@ -247,3 +247,7 @@ private cacheProductos(productos: Producto[]): void {
     if (error instanceof HttpErrorResponse) {
       return error.error?.message || error.message;
     }
+    return error?.message || error?.error?.message;
+
+
+}

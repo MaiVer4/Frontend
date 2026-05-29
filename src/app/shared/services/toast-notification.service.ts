@@ -14,7 +14,7 @@ export interface Toast {
 export class ToastNotificationService {
   private toasts$ = new BehaviorSubject<Toast[]>([]);
   private toastCounter = 0;
-  private timeoutIds: Map<string, NodeJS.Timeout> = new Map();
+  private timeoutIds: Map<string, ReturnType<typeof setTimeout>> = new Map();
 
   getToasts(): Observable<Toast[]> {
     return this.toasts$.asObservable();
@@ -66,6 +66,6 @@ export class ToastNotificationService {
   clear(): void {
     this.timeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
     this.timeoutIds.clear();
-    this.toasts$.next([])
+    this.toasts$.next([]);
   }
 }
