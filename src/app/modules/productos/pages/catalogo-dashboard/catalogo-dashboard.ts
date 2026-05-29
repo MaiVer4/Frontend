@@ -99,6 +99,12 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
     this.mostrarModal = true;
   }
 
+  onImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill="%23eee" width="100%" height="100%"/><text x="50%" y="50%" alignment-baseline="middle" text-anchor="middle" fill="%23999" font-size="12">No image</text></svg>';
+    img.src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+  }
+
   guardarDesdeForm(producto: Producto): void {
     if (this.productoSeleccionado?.codigo) {
       this.actualizar(producto);
