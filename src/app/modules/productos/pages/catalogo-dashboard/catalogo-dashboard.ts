@@ -19,6 +19,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
   productoSeleccionado?: Producto | null;
   loading = false;
   private destroyed$ = new Subject<void>();
+  private readonly STORAGE_KEY = 'gestion-app:productos';
 
   constructor(
     private productoService: ProductoService,
@@ -29,6 +30,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.restoreCachedProductos();
     this.cargarProductos();
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
@@ -70,10 +72,14 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
     this.productoService.obtenerProductos().subscribe({
       next: data => {
         this.productos = data;
+        this.cacheProductos(data);
         this.loading = false;
       },
       error: err => {
         this.loading = false;
+        if (!this.productos.length) {
+          this.restoreCachedProductos();
+        }
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo cargar la lista de productos. Verifica el backend en http://localhost:8080';
         this.toastService.error(errorMessage, 5000);
         this.logger.error('Error cargando productos', err);
@@ -105,6 +111,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
 
     // Actualización optimista: añadimos el producto localmente para que sea visible inmediatamente
     this.productos = [producto, ...this.productos];
+    this.cacheProductos(this.productos);
 
     // Cerramos modal y mostramos notificación de éxito inmediata
     this.mostrarModal = false;
@@ -118,6 +125,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
       error: err => {
         // Revertir si falla
         this.productos = previous;
+        this.cacheProductos(previous);
         this.toastService.remove(toastId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo crear el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
@@ -142,6 +150,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
     if (idx >= 0) {
       const updatedLocal = { ...this.productos[idx], ...producto };
       this.productos = this.productos.map(p => p.codigo === codigo ? updatedLocal : p);
+      this.cacheProductos(this.productos);
     }
 
     // Cerramos modal y notificamos éxito inmediatamente
@@ -156,6 +165,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
       error: err => {
         // Revertir cambios locales
         this.productos = previous;
+        this.cacheProductos(previous);
         this.toastService.remove(toastId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo actualizar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
@@ -176,6 +186,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
 
     // Actualización optimista de la UI: removemos localmente inmediatamente
     this.productos = this.productos.filter(p => p.codigo !== codigo);
+    this.cacheProductos(this.productos);
 
     // Notificación instantánea al usuario
     const toastId = this.toastService.success(`Producto "${productName}" eliminado correctamente`);
@@ -188,12 +199,35 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
       error: err => {
         // Revertir cambios locales si falla la eliminación
         this.productos = previous;
+        this.cacheProductos(previous);
         this.toastService.remove(toastId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo eliminar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         this.logger.error('Error eliminando producto', err);
       }
     });
+  }
+
+private cacheProductos(productos: Producto[]): void {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(productos));
+    } catch {
+      // Ignorar si el almacenamiento no está disponible
+    }
+  }
+
+  private restoreCachedProductos(): void {
+    try {
+      const cached = localStorage.getItem(this.STORAGE_KEY);
+      if (cached) {
+        const productos = JSON.parse(cached) as Producto[];
+        if (Array.isArray(productos) && productos.length > 0) {
+          this.productos = productos;
+        }
+      }
+    } catch {
+      // Ignorar si el almacenamiento no está disponible o el JSON es inválido.
+    }
   }
 
   private extractErrorMessage(error: any): string | undefined {
