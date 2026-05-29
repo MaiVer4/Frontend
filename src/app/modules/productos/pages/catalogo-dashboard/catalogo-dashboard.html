@@ -62,7 +62,7 @@
           </tr>
         </thead>
         <tbody *ngIf="productos.length > 0">
-          <tr *ngFor="let p of productos">
+          <tr *ngFor="let p of productos; trackBy: trackByProductoCodigo">
             <td class="image-cell">
               <img [src]="p.imagenUrl" [alt]="p.nombre" class="product-image" />
             </td>

@@ -1,5 +1,5 @@
 <div class="toast-container">
-  <div *ngFor="let toast of toasts" 
+  <div *ngFor="let toast of toasts; trackBy: trackByToastId" 
        class="toast"
        [class]="'toast--' + toast.type"
        role="alert">

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, OnChanges, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Producto } from '../../../../core/models/producto.interface';
 
@@ -7,6 +7,7 @@ import { Producto } from '../../../../core/models/producto.interface';
   standalone: false,
   templateUrl: './producto-form.html',
   styleUrls: ['./producto-form.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ProductoForm implements OnInit, OnChanges {
   @Input() isVisible: boolean = false;

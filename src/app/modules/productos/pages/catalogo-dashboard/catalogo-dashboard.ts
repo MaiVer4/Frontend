@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, Subject, takeUntil } from 'rxjs';
 import { Producto } from '../../../../core/models/producto.interface';
@@ -13,6 +13,7 @@ import { HttpErrorResponse } from '@angular/common/http';
   standalone: false,
   templateUrl: './catalogo-dashboard.html',
   styleUrls: ['./catalogo-dashboard.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CatalogoDashboard implements OnInit, OnDestroy {
   productos: Producto[] = [];
@@ -66,6 +67,10 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
 
   get valorInventario(): number {
     return this.productos.reduce((sum, p) => sum + p.cantidad * p.precio, 0);
+  }
+
+  trackByProductoCodigo(index: number, producto: Producto): string {
+    return producto.codigo;
   }
 
   cargarProductos(): void {
