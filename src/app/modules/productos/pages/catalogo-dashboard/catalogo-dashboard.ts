@@ -76,10 +76,10 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
         this.loading = false;
       },
       error: err => {
-        this.loading = false;
         if (!this.productos.length) {
           this.restoreCachedProductos();
         }
+        this.loading = false;
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo cargar la lista de productos. Verifica el backend en http://localhost:8080';
         this.toastService.error(errorMessage, 5000);
         this.logger.error('Error cargando productos', err);
