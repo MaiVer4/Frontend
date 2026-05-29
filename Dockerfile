@@ -11,7 +11,8 @@ RUN npm install
 # Instalar Angular CLI de forma global en el contenedor
 RUN npm install -g @angular/cli
 
-# Copiar el resto del código fuente
+# Copiar el resto del código fuente 
+# (OJO: Asegúrate de que tenga el espacio y los DOS puntos separados así: . .)
 COPY . .
 
 # Exponer el puerto por defecto de Angular
