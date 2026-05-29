@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter, Subject, takeUntil } from 'rxjs';
 import { Producto } from '../../../../core/models/producto.interface';
 import { ProductoService } from '../../../../core/service/producto.service';
 import { ToastNotificationService } from '../../../../shared/services/toast-notification.service';
@@ -11,21 +13,35 @@ import { LoggerService } from '../../../../shared/services/logger.service';
   templateUrl: './catalogo-dashboard.html',
   styleUrls: ['./catalogo-dashboard.css'],
 })
-export class CatalogoDashboard implements OnInit {
+export class CatalogoDashboard implements OnInit, OnDestroy {
   productos: Producto[] = [];
   mostrarModal = false;
   productoSeleccionado?: Producto | null;
   loading = false;
+  private destroyed$ = new Subject<void>();
 
   constructor(
     private productoService: ProductoService,
     private toastService: ToastNotificationService,
     private confirmService: ConfirmService,
-    private logger: LoggerService
+    private logger: LoggerService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
     this.cargarProductos();
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      filter((event: NavigationEnd) => event.urlAfterRedirects.includes('/productos')),
+      takeUntil(this.destroyed$)
+    ).subscribe(() => {
+      this.cargarProductos();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   get totalProductos(): number {
