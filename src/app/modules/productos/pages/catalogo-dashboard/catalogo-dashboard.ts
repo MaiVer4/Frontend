@@ -30,6 +30,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.loading = true;
     this.restoreCachedProductos();
     this.cargarProductos();
     this.router.events.pipe(
