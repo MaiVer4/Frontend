@@ -14,6 +14,7 @@ export interface Toast {
 export class ToastNotificationService {
   private toasts$ = new BehaviorSubject<Toast[]>([]);
   private toastCounter = 0;
+  private timeoutIds: Map<string, NodeJS.Timeout> = new Map();
 
   getToasts(): Observable<Toast[]> {
     return this.toasts$.asObservable();
@@ -43,20 +44,28 @@ export class ToastNotificationService {
     this.toasts$.next([...currentToasts, toast]);
 
     if (duration > 0) {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         this.remove(id);
       }, duration);
+      this.timeoutIds.set(id, timeoutId);
     }
 
     return id;
   }
 
   remove(id: string): void {
+    const timeoutId = this.timeoutIds.get(id);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+      this.timeoutIds.delete(id);
+    }
     const currentToasts = this.toasts$.value;
     this.toasts$.next(currentToasts.filter(t => t.id !== id));
   }
 
   clear(): void {
-    this.toasts$.next([]);
+    this.timeoutIds.forEach(timeoutId => clearTimeout(timeoutId));
+    this.timeoutIds.clear();
+    this.toasts$.next([])
   }
 }

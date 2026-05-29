@@ -6,6 +6,7 @@ import { ProductoService } from '../../../../core/service/producto.service';
 import { ToastNotificationService } from '../../../../shared/services/toast-notification.service';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { LoggerService } from '../../../../shared/services/logger.service';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-catalogo-dashboard',
@@ -231,8 +232,7 @@ private cacheProductos(productos: Producto[]): void {
     }
   }
 
-  private extractErrorMessage(error: any): string | undefined {
-    return error?.message || error?.error?.message;
-  }
-
-} 
+  private extractErrorMessage(error: HttpErrorResponse | any): string | undefined {
+    if (error instanceof HttpErrorResponse) {
+      return error.error?.message || error.message;
+    }

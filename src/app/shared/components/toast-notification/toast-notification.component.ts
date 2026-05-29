@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Subject, takeUntil } from 'rxjs';
 import { Toast, ToastNotificationService } from '../../services/toast-notification.service';
 
 @Component({
@@ -7,15 +8,23 @@ import { Toast, ToastNotificationService } from '../../services/toast-notificati
   templateUrl: './toast-notification.component.html',
   styleUrls: ['./toast-notification.component.css']
 })
-export class ToastNotificationComponent implements OnInit {
+export class ToastNotificationComponent implements OnInit, OnDestroy {
   toasts: Toast[] = [];
+  private destroyed$ = new Subject<void>();
 
   constructor(private toastService: ToastNotificationService) {}
 
   ngOnInit(): void {
-    this.toastService.getToasts().subscribe(toasts => {
+    this.toastService.getToasts().pipe(
+      takeUntil(this.destroyed$)
+    ).subscribe(toasts => {
       this.toasts = toasts;
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed$.next();
+    this.destroyed$.complete();
   }
 
   close(id: string): void {
