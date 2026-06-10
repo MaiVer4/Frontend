@@ -5,7 +5,7 @@
  * Facilita cambios entre ambientes (desarrollo, producción, etc.)
  */
 export const API_CONFIG = {
-  baseUrl: 'gestion-app-api-app-production.up.railway.app',
+  baseUrl: 'https://gestion-app-api-app-production.up.railway.app',
   endpoints: {
     productos: '/productos'
   }
