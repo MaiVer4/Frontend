@@ -29,7 +29,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
     private confirmService: ConfirmService,
     private logger: LoggerService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loading = true;
@@ -221,7 +221,7 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
     });
   }
 
-private cacheProductos(productos: Producto[]): void {
+  private cacheProductos(productos: Producto[]): void {
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(productos));
     } catch {
@@ -249,5 +249,5 @@ private cacheProductos(productos: Producto[]): void {
     }
     return error?.message || error?.error?.message;
 
-
+  }
 }
