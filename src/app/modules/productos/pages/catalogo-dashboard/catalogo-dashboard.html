@@ -33,7 +33,7 @@
     </article>
     <article class="stat-card">
       <span class="stat-label">Valor inventario</span>
-      <strong>{{ valorInventario | currency:'USD':'symbol':'1.0-0' }}</strong>
+      <strong>{{ valorInventario | currency:'COP':'symbol':'1.0-0' }}</strong>
     </article>
   </section>
 
@@ -69,7 +69,7 @@
             <td>{{ p.codigo }}</td>
             <td>{{ p.nombre }}</td>
             <td>{{ p.descripcion }}</td>
-            <td>{{ p.precio | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ p.precio | currency:'COP':'symbol':'1.2-2' }}</td>
             <td>{{ p.cantidad }}</td>
             <td>
               <span class="pill" [class.pill--active]="p.estado === 'ACTIVO'" [class.pill--inactive]="p.estado === 'INACTIVO'">{{ p.estado }}</span>
