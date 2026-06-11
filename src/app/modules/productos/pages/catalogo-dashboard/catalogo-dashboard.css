@@ -47,47 +47,6 @@
   flex-wrap: wrap;
 }
 
-.button {
-  border: none;
-  border-radius: 12px;
-  padding: 12px 18px;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.button:hover {
-  transform: translateY(-1px);
-}
-
-.button:active {
-  transform: translateY(0);
-}
-
-.button-primary {
-  background: #0f172a;
-  color: white;
-  box-shadow: 0 16px 36px rgba(15, 23, 42, 0.12);
-}
-
-.button-secondary {
-  background: #f8fafc;
-  color: #0f172a;
-}
-
-.button-small {
-  padding: 8px 12px;
-  font-size: 0.95rem;
-}
-
-.button-ghost {
-  background: #eef2ff;
-  color: #1e293b;
-}
-
-.button-danger {
-  background: #ef4444;
-  color: #fff;
-}
 
 .stats-grid {
   display: grid;
@@ -116,6 +75,13 @@
 
 .stat-card strong {
   font-size: 2rem;
+  color: #0f172a;
+}
+
+/* Inventory value: smaller number and keep styling scoped to this card only */
+.stat-card--inventory .stat-value--small {
+  font-size: 1.7rem; /* reduced from 2rem */
+  display: inline-block;
   color: #0f172a;
 }
 
@@ -288,27 +254,6 @@
 
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 1024px) and (min-width: 721px) {
-  .product-table th,
-  .product-table td {
-    padding: 14px 10px;
-    font-size: 0.9rem;
-  }
-
-  .product-image {
-    width: 50px;
-    height: 50px;
-  }
-
-  .actions-cell {
-    flex-direction: column;
-  }
-
-  .button-small {
-    width: 100%;
   }
 }
 

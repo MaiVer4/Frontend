@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject, Observable } from 'rxjs';
 
 /**
  * ConfirmService
@@ -11,18 +12,19 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class ConfirmService {
-  /**
-   * Solicita confirmación del usuario mediante un diálogo.
-   * Por defecto usa window.confirm, pero permite ser inyectado para tests.
-   * @param message - Mensaje a mostrar en el diálogo
-   * @returns true si el usuario confirmó, false si canceló
-   */
-  confirm(message: string): boolean {
-    // Implementación abstracta que puede ser inyectada en tests
-    return this.showConfirmDialog(message);
+  private requestSubject = new Subject<{ message: string; title: string; resolve: (value: boolean) => void } | null>();
+
+  confirm(message: string, title = 'Confirmar'): Promise<boolean> {
+    return new Promise<boolean>(resolve => {
+      this.requestSubject.next({ message, title, resolve });
+    });
   }
 
-  protected showConfirmDialog(message: string): boolean {
-    return window.confirm(message);
+  clearRequest(): void {
+    this.requestSubject.next(null);
+  }
+
+  getRequest(): Observable<{ message: string; title: string; resolve: (value: boolean) => void } | null> {
+    return this.requestSubject.asObservable();
   }
 }

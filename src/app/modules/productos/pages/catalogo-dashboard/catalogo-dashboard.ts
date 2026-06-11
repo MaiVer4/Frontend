@@ -126,14 +126,11 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
     this.productos = [producto, ...this.productos];
     this.cacheProductos(this.productos);
 
-    // Cerramos modal y mostramos notificación de estado mientras se crea en backend
+    // Cerramos modal y realizamos la creación en backend. Mostramos éxito/errores solo después.
     this.mostrarModal = false;
-    const pendingId = this.toastService.info(`Creando producto "${producto.nombre}"...`, 0);
 
     this.productoService.crearProducto(producto).subscribe({
       next: () => {
-        // Remover toast pendiente y mostrar éxito
-        this.toastService.remove(pendingId);
         this.toastService.success(`Producto "${producto.nombre}" creado exitosamente`);
         // Refrescar desde servidor para obtener datos canónicos
         this.cargarProductos();
@@ -142,7 +139,6 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
         // Revertir si falla
         this.productos = previous;
         this.cacheProductos(previous);
-        this.toastService.remove(pendingId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo crear el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         this.logger.error('Error creando producto', err);
@@ -169,13 +165,11 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
       this.cacheProductos(this.productos);
     }
 
-    // Cerramos modal y mostramos notificación de estado mientras se actualiza en backend
+    // Cerramos modal y realizamos la actualización en backend. Mostramos éxito/errores solo después.
     this.mostrarModal = false;
-    const pendingId = this.toastService.info(`Actualizando producto "${producto.nombre}"...`, 0);
 
     this.productoService.actualizarProducto(codigo, producto).subscribe({
       next: () => {
-        this.toastService.remove(pendingId);
         this.toastService.success(`Producto "${producto.nombre}" actualizado exitosamente`);
         this.productoSeleccionado = null;
         this.cargarProductos();
@@ -184,7 +178,6 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
         // Revertir cambios locales
         this.productos = previous;
         this.cacheProductos(previous);
-        this.toastService.remove(pendingId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo actualizar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         this.logger.error('Error actualizando producto', err);
@@ -192,12 +185,12 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
     });
   }
 
-  eliminar(codigo: string): void {
+  async eliminar(codigo: string): Promise<void> {
     const index = this.productos.findIndex(p => p.codigo === codigo);
     const productName = index >= 0 ? this.productos[index].nombre : 'Producto';
-    const confirmDelete = this.confirmService.confirm(`¿Está seguro que desea eliminar "${productName}"? Esta acción no se puede deshacer.`);
+    const confirmed = await this.confirmService.confirm(`¿Está seguro que desea eliminar "${productName}"? Esta acción no se puede deshacer.`);
 
-    if (!confirmDelete) return;
+    if (!confirmed) return;
 
     // Guardamos copia para poder revertir en caso de fallo
     const previous = [...this.productos];
@@ -206,13 +199,8 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
     this.productos = this.productos.filter(p => p.codigo !== codigo);
     this.cacheProductos(this.productos);
     
-    // Notificación de estado mientras se procesa la eliminación en backend
-    const pendingId = this.toastService.info(`Eliminando producto "${productName}"...`, 0);
-
     this.productoService.eliminarProducto(codigo).subscribe({
       next: () => {
-        // Remover toast pendiente y mostrar éxito
-        this.toastService.remove(pendingId);
         this.toastService.success(`Producto "${productName}" eliminado correctamente`);
         // Refrescamos desde el servidor para mantener sincronía
         this.cargarProductos();
@@ -221,7 +209,6 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
         // Revertir cambios locales si falla la eliminación
         this.productos = previous;
         this.cacheProductos(previous);
-        this.toastService.remove(pendingId);
         const errorMessage = this.extractErrorMessage(err) || 'No se pudo eliminar el producto. Revisa la conexión con el backend.';
         this.toastService.error(errorMessage);
         this.logger.error('Error eliminando producto', err);
@@ -251,11 +238,19 @@ export class CatalogoDashboard implements OnInit, OnDestroy {
     }
   }
 
-  private extractErrorMessage(error: HttpErrorResponse | any): string | undefined {
+  private extractErrorMessage(error: unknown): string | undefined {
     if (error instanceof HttpErrorResponse) {
       return error.error?.message || error.message;
     }
-    return error?.message || error?.error?.message;
 
+    if (this.isErrorLike(error)) {
+      return error.message ?? error.error?.message;
+    }
+
+    return undefined;
+  }
+
+  private isErrorLike(error: unknown): error is { message?: string; error?: { message?: string } } {
+    return typeof error === 'object' && error !== null;
   }
 }

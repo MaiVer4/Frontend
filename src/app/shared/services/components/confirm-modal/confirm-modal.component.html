@@ -1,0 +1,10 @@
+<div *ngIf="visible" class="confirm-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+  <div class="confirm-modal">
+    <h2 id="confirmModalTitle">{{ title }}</h2>
+    <p>{{ message }}</p>
+    <div class="confirm-modal-actions">
+      <button type="button" class="cancel-button" (click)="onCancel()">Cancelar</button>
+      <button #confirmButton type="button" class="confirm-button" (click)="onConfirm()">Confirmar</button>
+    </div>
+  </div>
+</div>

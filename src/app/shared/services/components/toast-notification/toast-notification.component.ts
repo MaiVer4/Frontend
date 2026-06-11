@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { Subject, takeUntil } from 'rxjs';
-import { Toast, ToastNotificationService } from '../../services/toast-notification.service';
+import { Toast, ToastNotificationService } from '../../toast-notification.service';
 
 @Component({
   selector: 'app-toast-notification',
@@ -13,13 +13,15 @@ export class ToastNotificationComponent implements OnInit, OnDestroy {
   toasts: Toast[] = [];
   private destroyed$ = new Subject<void>();
 
-  constructor(private toastService: ToastNotificationService) {}
+  constructor(private toastService: ToastNotificationService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     this.toastService.getToasts().pipe(
       takeUntil(this.destroyed$)
     ).subscribe(toasts => {
       this.toasts = toasts;
+      // Ensure OnPush components update when toasts change
+      this.cdr.markForCheck();
     });
   }
 

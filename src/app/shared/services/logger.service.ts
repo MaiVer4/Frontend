@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
-const isLocalhost = ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
-const isProduction = !isLocalhost;
+const isProduction = environment.production;
 
 export function logError(...args: unknown[]): void {
   if (!isProduction) {

@@ -31,9 +31,9 @@
       <span class="stat-label">Unidades en stock</span>
       <strong>{{ unidadesStock }}</strong>
     </article>
-    <article class="stat-card">
+    <article class="stat-card stat-card--inventory">
       <span class="stat-label">Valor inventario</span>
-      <strong>{{ valorInventario | currency:'COP':'symbol':'1.0-0' }}</strong>
+      <strong class="stat-value--small">{{ valorInventario | number:'1.0-0' }}</strong>
     </article>
   </section>
 
